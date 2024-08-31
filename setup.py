@@ -15,7 +15,7 @@ long_description = open('README.md', encoding="utf8").read()
 
 setuptools.setup(
     name = 'nbclassic-toc2',
-    version = '0.0.2',
+    version = '0.0.3',
     description = 'Collect all running headers and display them in a floating window, as a sidebar or with a navigation menu',
     keywords = 'notebook',
     author = 'Nbextensions team',

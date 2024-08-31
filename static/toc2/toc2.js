@@ -224,7 +224,8 @@
             .append($("<div/>").attr("id", "navigate_menu").addClass('toc')))
 
         // Set a default minimum height
-        var defaultMinHeight = '200px';
+        var defaultMinHeight = '400px';
+        var defaultMinWidth = '300px';
 
         if (cfg['nav_menu']) {
             $('#Navigate_menu').css(cfg['nav_menu'])
@@ -233,15 +234,17 @@
         } else {
             cfg.nav_menu = {};
             // Set the default minimum height if no configuration exists
+            $('#Navigate_menu').css('min-width', defaultMinWidth)
+            $('#navigate_menu').css('min-width', defaultMinWidth)
             $('#Navigate_menu').css('min-height', defaultMinHeight)
             $('#navigate_menu').css('min-height', defaultMinHeight)
         }
 
         // Ensure the navigate_menu has at least the minimum height
+        var currentWidth = $('#navigate_menu').width();
+        if (currentWidth < parseInt(defaultMinWidth)) { $('#navigate_menu').css('width', defaultMinWidth); }
         var currentHeight = $('#navigate_menu').height();
-        if (currentHeight < parseInt(defaultMinHeight)) {
-            $('#navigate_menu').css('height', defaultMinHeight);
-        }
+        if (currentHeight < parseInt(defaultMinHeight)) { $('#navigate_menu').css('height', defaultMinHeight); }
 
         events.on("before_save.Notebook",
             function() {
