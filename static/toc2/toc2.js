@@ -30,11 +30,8 @@
         navigate_menu: true,
         threshold: 4,
         widenNotebook: false,
-    };
-    // default values for per-notebook configurable parameters
-    var metadata_settings = {
         nav_menu: {},
-        number_sections: true,
+        number_sections: false,
         sideBar: true,
         skip_h1_title: false,
         base_numbering: 1,
@@ -45,36 +42,8 @@
         toc_section_display: true,
         toc_window_display: false,
     };
-    $.extend(true, default_cfg, metadata_settings);
 
-    /**
-     *  Read our config from server config & notebook metadata
-     *  This function should only be called when both:
-     *   1. the notebook (and its metadata) has fully loaded
-     *  AND
-     *   2. Jupyter.notebook.config.loaded has resolved
-     */
-    var read_config = function () {
-        var cfg = default_cfg;
-
-        if (!liveNotebook) {
-            return cfg;
-        }
-
-        // config may be specified at system level or at document level.
-        // first, update defaults with config loaded from server
-        $.extend(true, cfg, IPython.notebook.config.data.toc2);
-        // ensure notebook metadata has toc object, cache old values
-        var md = IPython.notebook.metadata.toc || {};
-        // reset notebook metadata to remove old values
-        IPython.notebook.metadata.toc = {};
-        // then update cfg with any found in current notebook metadata
-        // and save in nb metadata (then can be modified per document)
-        Object.keys(metadata_settings).forEach(function (key) {
-            cfg[key] = IPython.notebook.metadata.toc[key] = (md.hasOwnProperty(key) ? md : cfg)[key];
-        });
-        return cfg;
-    };
+   var read_config = function () { return default_cfg; };
 
     // globally-used status variables:
     var rendering_toc_cell = false;
@@ -99,20 +68,7 @@
     }
     var Jupyter = IPython;
 
-    var setMd = function(key, value) {
-        if (liveNotebook) {
-            var md = IPython.notebook.metadata.toc;
-            if (md === undefined) {
-                md = IPython.notebook.metadata.toc = {};
-            }
-            var old_val = md[key];
-            md[key] = value;
-            if (typeof _ !== undefined ? !_.isEqual(value, old_val) : old_val != value) {
-                IPython.notebook.set_dirty();
-            }
-        }
-        return value;
-    };
+    var setMd = function(key, value) { return value; };
 
     function incr_lbl(ary, h_idx) { //increment heading label  w/ h_idx (zero based)
         ary[h_idx]++;
@@ -418,14 +374,7 @@
 
         // On header/menu/toolbar resize, resize the toc itself
         $(window).on('resize', callbackPageResize);
-        if (liveNotebook) {
-            events.on("resize-header.Page toggle-all-headers", callbackPageResize);
-            $.extend(toc_position, IPython.notebook.metadata.toc.toc_position);
-        }
-        else {
-            // default to true for non-live notebook
-            cfg.toc_window_display = true;
-        }
+        cfg.toc_window_display = false;
         // restore toc position at load
         toc_wrapper.css(cfg.sideBar ? {width: toc_position.width} : toc_position);
         // older toc2 versions stored string representations, so update those
@@ -665,7 +614,7 @@
                 $('#navigate_menu').empty().append($('#toc > .toc-item').clone());
             }
             if ($('#Navigate_menu').length == 0) {
-                create_navigate_menu((liveNotebook ? IPython.notebook.metadata.toc : cfg), pop_nav);
+                create_navigate_menu(cfg, pop_nav);
             } else {
                 pop_nav()
             }
@@ -707,7 +656,7 @@
             table_of_contents(cfg, st);
         };
         var build_setting_input = function (md_key, md_label, input_type) {
-            var opts = liveNotebook ? IPython.notebook.metadata.toc : cfg;
+            var opts = cfg;
             var id = 'toc-settings-' + md_key;
             var fg = $('<div>').append(
                 $('<label>').text(md_label).attr('for', id));
